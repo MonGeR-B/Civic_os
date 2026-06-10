@@ -1,0 +1,9 @@
+fastapi==0.115.5
+uvicorn[standard]==0.32.0
+sqlalchemy==2.0.50
+asyncpg==0.31.0
+geoalchemy2==0.14.3
+shapely==2.1.2
+pydantic==2.13.4
+python-multipart==0.0.9
+pydantic-settings==2.14.1
