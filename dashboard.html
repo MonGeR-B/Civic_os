@@ -12,58 +12,119 @@
         #map {
             height: calc(100vh - 80px);
         }
+        
+        /* Customize Leaflet Popups to match dark theme */
+        .leaflet-popup-content-wrapper {
+            background: rgba(15, 23, 42, 0.95) !important;
+            color: #f1f5f9 !important;
+            border: 1px solid rgba(51, 65, 85, 0.8) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(8px);
+        }
+        .leaflet-popup-tip {
+            background: rgba(15, 23, 42, 0.95) !important;
+            border-left: 1px solid rgba(51, 65, 85, 0.8) !important;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.8) !important;
+        }
+        .leaflet-popup-close-button {
+            color: #94a3b8 !important;
+        }
+        .leaflet-popup-close-button:hover {
+            color: #f1f5f9 !important;
+        }
+
+        /* Custom scrollbar for incident feed */
+        #incident-feed::-webkit-scrollbar {
+            width: 4px;
+        }
+        #incident-feed::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #incident-feed::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        #incident-feed::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
     </style>
 </head>
 
 <body class="bg-slate-900 text-slate-100 font-sans overflow-hidden">
 
-    <header class="h-20 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6 shadow-xl">
-        <div class="flex items-center space-x-3">
-            <div class="bg-emerald-500 w-3 h-3 rounded-full animate-pulse"></div>
-            <h1 class="text-xl font-bold tracking-wider text-emerald-400">CivicOS // WEST BENGAL</h1>
+    <header class="h-20 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-4 md:px-6 shadow-xl">
+        <div class="flex items-center space-x-2 md:space-x-3">
+            <div class="bg-emerald-500 w-2.5 h-2.5 md:w-3 md:h-3 rounded-full animate-pulse"></div>
+            <h1 class="text-sm md:text-xl font-bold tracking-wider text-emerald-400">CivicOS // WB</h1>
         </div>
-        <div class="flex space-x-8 text-sm font-semibold">
-            <div class="bg-slate-900 px-4 py-2 rounded-lg border border-slate-700">
-                Garbage Issues: <span id="garbage-count" class="text-red-400 font-bold">0</span>
+        <div class="flex space-x-2 md:space-x-8 text-[11px] md:text-sm font-semibold">
+            <div class="bg-slate-900 px-2.5 md:px-4 py-1.5 md:py-2 rounded-lg border border-slate-700 flex items-center space-x-1 md:space-x-2">
+                <span class="text-red-400">🗑️</span>
+                <span>Garbage: <span id="garbage-count" class="text-red-400 font-bold">0</span></span>
             </div>
-            <div class="bg-slate-900 px-4 py-2 rounded-lg border border-slate-700">
-                Dead Streetlights: <span id="light-count" class="text-amber-400 font-bold">0</span>
+            <div class="bg-slate-900 px-2.5 md:px-4 py-1.5 md:py-2 rounded-lg border border-slate-700 flex items-center space-x-1 md:space-x-2">
+                <span class="text-amber-400">💡</span>
+                <span>Lights: <span id="light-count" class="text-amber-400 font-bold">0</span></span>
             </div>
-            <div class="bg-slate-900 px-4 py-2 rounded-lg border border-slate-700">
-                Trees Planted: <span id="tree-count" class="text-emerald-400 font-bold">0</span>
+            <div class="bg-slate-900 px-2.5 md:px-4 py-1.5 md:py-2 rounded-lg border border-slate-700 flex items-center space-x-1 md:space-x-2">
+                <span class="text-emerald-400">🌲</span>
+                <span>Trees: <span id="tree-count" class="text-emerald-400 font-bold">0</span></span>
             </div>
         </div>
     </header>
 
-    <main class="grid grid-cols-12">
-        <section class="col-span-3 bg-slate-800 p-6 space-y-6 border-r border-slate-700 overflow-y-auto"
+    <main class="flex flex-col md:grid md:grid-cols-12">
+        <section class="hidden md:flex md:col-span-3 bg-slate-800 p-6 flex-col justify-between border-r border-slate-700"
             style="height: calc(100vh - 80px);">
-            <div>
-                <h2 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-3">System Metrics</h2>
-                <p class="text-xs text-slate-400 leading-relaxed">
-                    Live telemetry feed reporting from local municipal wards across Greater Kolkata. Data auto-refreshes
-                    every 5 seconds.
-                </p>
-            </div>
+            
+            <div class="space-y-6 overflow-y-auto pr-1 flex-1">
+                <div>
+                    <h2 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-2">Command Telemetry</h2>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Live updates from Municipal Wards across Greater Kolkata. Map updates automatically every 5s.
+                    </p>
+                </div>
 
-            <div class="space-y-3">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Map Legend</h3>
-                <div class="flex items-center space-x-3 bg-slate-900 p-3 rounded-lg border border-slate-800">
-                    <span class="w-4 h-4 rounded-full bg-red-500 inline-block"></span>
-                    <span class="text-sm text-slate-300">Solid Waste / Garbage Pile</span>
+                <div class="space-y-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Map Legend</h3>
+                    
+                    <div class="flex items-center space-x-3 bg-slate-900 p-2.5 rounded-lg border border-slate-800/80">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-full bg-red-950/70 border border-red-500 text-red-400 shadow-[0_0_8px_rgba(239,68,68,0.4)]">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </div>
+                        <span class="text-xs text-slate-300">Solid Waste / Garbage Pile</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3 bg-slate-900 p-2.5 rounded-lg border border-slate-800/80">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-950/70 border border-amber-500 text-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.4)]">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M6 22V5a3 3 0 0 1 3-3h5m0 4v2m-3 0h6l-1 4h-4l-1-4Z"/><circle cx="14" cy="10" r="1.5" fill="currentColor"/></svg>
+                        </div>
+                        <span class="text-xs text-slate-300">Streetlight Dark-Zone Failure</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3 bg-slate-900 p-2.5 rounded-lg border border-slate-800/80">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-950/70 border border-emerald-500 text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)]">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="m12 2-8 8h3l-4 6h5v4h4v-4h5l-4-6h3z"/></svg>
+                        </div>
+                        <span class="text-xs text-slate-300">Registered Canopy Tree</span>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-3 bg-slate-900 p-3 rounded-lg border border-slate-800">
-                    <span class="w-4 h-4 rounded-full bg-amber-500 inline-block"></span>
-                    <span class="text-sm text-slate-300">Streetlight Dark-Zone Failure</span>
+
+                <div class="space-y-3 pt-2">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Live Incident Feed</h3>
+                    <div id="incident-feed" class="space-y-2 max-h-[260px] overflow-y-auto pr-1">
+                        <div class="text-xs text-slate-500 italic">Syncing with active database telemetry...</div>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-3 bg-slate-900 p-3 rounded-lg border border-slate-800">
-                    <span class="w-4 h-4 rounded-full bg-emerald-500 inline-block"></span>
-                    <span class="text-sm text-slate-300">Registered Canopy Tree</span>
-                </div>
+            </div>
+            
+            <div class="pt-4 border-t border-slate-700/60 mt-auto text-[10px] text-slate-500">
+                System status: <span class="text-emerald-400 font-bold uppercase">Secured</span>
             </div>
         </section>
 
-        <section class="col-span-9 relative">
+        <section class="col-span-12 md:col-span-9 relative">
             <div id="map" class="w-full"></div>
         </section>
     </main>
@@ -80,11 +141,61 @@
         // Global layer group to clear and re-draw markers on sync frames
         let markersLayer = L.layerGroup().addTo(map);
 
+        // Define premium custom markers using Tailwind + Lucide SVGs
+        const createGarbageIcon = () => L.divIcon({
+            className: 'custom-marker-garbage',
+            html: `
+            <div class="flex items-center justify-center w-9 h-9 rounded-full bg-red-950/80 border border-red-500 text-red-400 shadow-[0_0_12px_rgba(239,68,68,0.5)] hover:scale-110 transition-transform duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                    <path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+            </div>
+            `,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+            popupAnchor: [0, -18]
+        });
+
+        const createLightIcon = () => L.divIcon({
+            className: 'custom-marker-light',
+            html: `
+            <div class="flex items-center justify-center w-9 h-9 rounded-full bg-amber-950/80 border border-amber-500 text-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.5)] hover:scale-110 transition-transform duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                    <path d="M6 22V5a3 3 0 0 1 3-3h5" />
+                    <path d="M14 6v2" />
+                    <path d="M11 8h6l-1 4h-4l-1-4Z" />
+                    <circle cx="14" cy="10" r="1.5" fill="currentColor" />
+                </svg>
+            </div>
+            `,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+            popupAnchor: [0, -18]
+        });
+
+        const createTreeIcon = () => L.divIcon({
+            className: 'custom-marker-tree',
+            html: `
+            <div class="flex items-center justify-center w-9 h-9 rounded-full bg-emerald-950/80 border border-emerald-500 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.5)] hover:scale-110 transition-transform duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                    <path d="m12 2-8 8h3l-4 6h5v4h4v-4h5l-4-6h3z" />
+                </svg>
+            </div>
+            `,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+            popupAnchor: [0, -18]
+        });
+
         async function streamLiveTelemetry() {
             try {
-                // Fetch data asynchronously from both endpoints
-                const ticketsResponse = await fetch('http://127.0.0.1:8001/api/v1/tickets/map');
-                const treesResponse = await fetch('http://127.0.0.1:8001/api/v1/trees/map');
+                // Dynamically build host so it works in both desktop browser and mobile WebView without hardcoding
+                const host = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+                    ? window.location.origin
+                    : window.location.origin; // Automatically matches IP e.g. http://10.18.17.252:8001
+
+                const ticketsResponse = await fetch(`${host}/api/v1/tickets/map`);
+                const treesResponse = await fetch(`${host}/api/v1/trees/map`);
 
                 const ticketsData = await ticketsResponse.json();
                 const treesData = await treesResponse.json();
@@ -95,58 +206,128 @@
                 let garbageCount = 0;
                 let lightCount = 0;
 
-                // Plot Ticket Features
+                        // Plot Ticket Features
+                let newestTicket = null;
                 ticketsData.features.forEach(ticket => {
-                    let markerColor = '#ef4444'; // Default Red for Garbage
+                    let markerIcon;
                     if (ticket.category === 'streetlight') {
-                        markerColor = '#f59e0b'; // Amber for Light
+                        markerIcon = createLightIcon();
                         lightCount++;
                     } else {
+                        markerIcon = createGarbageIcon();
                         garbageCount++;
                     }
 
-                    const circleMarker = L.circleMarker([ticket.coordinates.lat, ticket.coordinates.lng], {
-                        radius: 8,
-                        fillColor: markerColor,
-                        color: '#ffffff',
-                        weight: 1.5,
-                        opacity: 1,
-                        fillOpacity: 0.8
-                    });
+                    const marker = L.marker([ticket.coordinates.lat, ticket.coordinates.lng], { icon: markerIcon });
+                    
+                    // Build absolute image URL relative to the page origin (works on desktop + mobile WebView)
+                    const imgSrc = ticket.image_url
+                        ? (ticket.image_url.startsWith('http') ? ticket.image_url : `${window.location.origin}${ticket.image_url}`)
+                        : null;
 
-                    circleMarker.bindPopup(`
-                        <div class="text-slate-900 font-sans">
-                            <strong class="uppercase text-xs tracking-wide text-slate-500">ID: #${ticket.id} (${ticket.category})</strong>
-                            <p class="text-sm font-bold mt-1">Status: <span class="text-blue-600">${ticket.status}</span></p>
+                    marker.bindPopup(`
+                        <div class="p-1 min-w-[200px]">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="px-2 py-0.5 text-[9px] font-bold uppercase rounded ${
+                                    ticket.category === 'streetlight' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                }">
+                                    ${ticket.category}
+                                </span>
+                                <span class="text-[10px] text-slate-400">ID: #${ticket.id}</span>
+                            </div>
+                            <h4 class="text-sm font-bold text-slate-100 mb-1">Status: 
+                                <span class="${
+                                    ticket.status === 'resolved' ? 'text-emerald-400' : ticket.status === 'assigned' ? 'text-blue-400' : 'text-red-400 animate-pulse'
+                                } capitalize">${ticket.status}</span>
+                            </h4>
+                            <p class="text-[10px] text-slate-400">Lat: ${ticket.coordinates.lat?.toFixed(5)}, Lng: ${ticket.coordinates.lng?.toFixed(5)}</p>
+                            <p class="text-[10px] text-slate-400">Reported: ${new Date(ticket.created_at).toLocaleString()}</p>
+                            ${imgSrc ? `<img src="${imgSrc}" class="mt-2 rounded-lg border border-slate-700 w-full h-24 object-cover" onerror="this.style.display='none'" />` : ''}
                         </div>
                     `);
-                    markersLayer.addLayer(circleMarker);
+                    markersLayer.addLayer(marker);
+
+                    // Track the most recent ticket so we can fly to it
+                    if (!newestTicket || new Date(ticket.created_at) > new Date(newestTicket.created_at)) {
+                        newestTicket = ticket;
+                    }
                 });
+
+                // If this is first load or a new ticket arrived, fly to it
+                const prevCount = window._lastTicketCount || 0;
+                if (newestTicket && ticketsData.total_tickets > prevCount) {
+                    map.flyTo([newestTicket.coordinates.lat, newestTicket.coordinates.lng], 15, {
+                        animate: true, duration: 1.5
+                    });
+                }
+                window._lastTicketCount = ticketsData.total_tickets;
 
                 // Plot Tree Canopy Features
                 treesData.features.forEach(tree => {
-                    const treeMarker = L.circleMarker([tree.coordinates.lat, tree.coordinates.lng], {
-                        radius: 6,
-                        fillColor: '#10b981', // Emerald Green for Trees
-                        color: '#ffffff',
-                        weight: 1,
-                        opacity: 1,
-                        fillOpacity: 0.9
-                    });
+                    const treeIcon = createTreeIcon();
+                    const marker = L.marker([tree.coordinates.lat, tree.coordinates.lng], { icon: treeIcon });
 
-                    treeMarker.bindPopup(`
-                        <div class="text-slate-900 font-sans">
-                            <strong class="text-emerald-600 text-sm">🌳 Species: ${tree.species}</strong>
-                            <p class="text-xs text-slate-500 mt-1">Planted on: ${new Date(tree.planted_at).toLocaleDateString()}</p>
+                    marker.bindPopup(`
+                        <div class="p-1 min-w-[200px]">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="px-2 py-0.5 text-[9px] font-bold uppercase rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                    Canopy Tree
+                                </span>
+                                <span class="text-[10px] text-slate-400">ID: #${tree.id}</span>
+                            </div>
+                            <h4 class="text-sm font-bold text-emerald-400 mb-1">🌲 ${tree.species}</h4>
+                            <p class="text-[10px] text-slate-400">Planted: ${new Date(tree.planted_at).toLocaleDateString()}</p>
+                            ${tree.image_url ? `<img src="${tree.image_url}" class="mt-2 rounded-lg border border-slate-700 w-full h-24 object-cover" onerror="this.style.display='none'" />` : ''}
                         </div>
                     `);
-                    markersLayer.addLayer(treeMarker);
+                    markersLayer.addLayer(marker);
                 });
 
                 // Update Dashboard Stat Counters
                 document.getElementById('garbage-count').innerText = garbageCount;
                 document.getElementById('light-count').innerText = lightCount;
                 document.getElementById('tree-count').innerText = treesData.total_trees_logged;
+
+                // Update Live Incident Feed in sidebar
+                const feedContainer = document.getElementById('incident-feed');
+                feedContainer.innerHTML = '';
+                
+                // Sort tickets by created_at desc (newest first) and take top 5
+                const sortedTickets = [...ticketsData.features]
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                    .slice(0, 5);
+                
+                if (sortedTickets.length === 0) {
+                    feedContainer.innerHTML = '<div class="text-xs text-slate-500 italic">No active incidents.</div>';
+                } else {
+                    sortedTickets.forEach(t => {
+                        const isLight = t.category === 'streetlight';
+                        const badgeColor = isLight ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30';
+                        const statusColor = t.status === 'resolved' ? 'text-emerald-400' : t.status === 'assigned' ? 'text-blue-400' : 'text-rose-400 animate-pulse';
+                        
+                        const item = document.createElement('div');
+                        item.className = "p-3 bg-slate-900 hover:bg-slate-900/60 rounded-lg border border-slate-800 hover:border-slate-600 transition-all cursor-pointer flex flex-col space-y-1.5 shadow-md";
+                        item.onclick = () => {
+                            map.flyTo([t.coordinates.lat, t.coordinates.lng], 15, {
+                                animate: true,
+                                duration: 1.5
+                            });
+                        };
+                        item.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <span class="px-2 py-0.5 text-[8px] font-extrabold uppercase rounded border ${badgeColor}">
+                                    ${t.category}
+                                </span>
+                                <span class="text-[9px] text-slate-500 font-semibold">#${t.id}</span>
+                            </div>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-[11px] font-medium text-slate-300">Status: <span class="${statusColor} capitalize font-bold">${t.status}</span></span>
+                                <span class="text-[9px] text-slate-500">${new Date(t.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            </div>
+                        `;
+                        feedContainer.appendChild(item);
+                    });
+                }
 
             } catch (error) {
                 console.error("Telemetry sync execution mismatch:", error);

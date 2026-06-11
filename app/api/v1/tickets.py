@@ -5,11 +5,71 @@ from app.core.database import get_db
 from app.models.models import Ticket, TicketStatus
 from app.services.allocation import auto_allocate_ticket  # Import the engine
 from sqlalchemy import select, func
+from PIL import Image, ImageDraw, ImageFont
+from datetime import datetime
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# Spatial bounding box coordinates for Greater Kolkata area
+KOLKATA_BOUNDS = {
+    "lat_min": 22.5000,
+    "lat_max": 22.6000,
+    "lng_min": 88.3300,
+    "lng_max": 88.4500
+}
+
+def get_ward_from_coordinates(lat: float, lng: float) -> int:
+    lat_step = (KOLKATA_BOUNDS["lat_max"] - KOLKATA_BOUNDS["lat_min"]) / 4
+    lng_step = (KOLKATA_BOUNDS["lng_max"] - KOLKATA_BOUNDS["lng_min"]) / 4
+    
+    row = int((lat - KOLKATA_BOUNDS["lat_min"]) / lat_step)
+    col = int((lng - KOLKATA_BOUNDS["lng_min"]) / lng_step)
+    
+    row = max(0, min(3, row))
+    col = max(0, min(3, col))
+    
+    return row * 4 + col + 1
+
+def watermark_image(image_path: str, lat: float, lng: float):
+    # Open the saved image
+    img = Image.open(image_path)
+    draw = ImageDraw.Draw(img)
+    
+    # Calculate ward and timestamp
+    ward_id = get_ward_from_coordinates(lat, lng)
+    timestamp_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    watermark_text = (
+        f"CivicOS WB // WARD: {ward_id} // "
+        f"LAT: {lat:.6f} LNG: {lng:.6f} // "
+        f"TIME: {timestamp_str} // EVIDENCE SECURE"
+    )
+    
+    width, height = img.size
+    
+    # Font size selection (approx 2.5% of height)
+    font_size = max(16, int(height * 0.025))
+    
+    try:
+        font = ImageFont.truetype("arial.ttf", font_size)
+    except IOError:
+        font = ImageFont.load_default()
+        
+    banner_height = font_size + 20
+    draw.rectangle(
+        [(0, height - banner_height), (width, height)],
+        fill=(15, 23, 42)  # Dark slate background
+    )
+    
+    # Draw text in light cyan (#22d3ee)
+    text_color = (34, 211, 238)
+    draw.text((15, height - banner_height + 8), watermark_text, fill=text_color, font=font)
+    
+    # Save the watermarked image
+    img.save(image_path)
 
 @router.post("/report")
 async def report_issue(
@@ -23,19 +83,30 @@ async def report_issue(
     if category not in ["garbage", "streetlight"]:
         raise HTTPException(status_code=400, detail="Invalid civic category.")
 
-    # Save file locally
-    file_path = os.path.join(UPLOAD_DIR, f"{category}_{reporter_id}_{file.filename}")
+    # Build a clean filename and save locally
+    safe_filename = f"{category}_{reporter_id}_{file.filename}"
+    file_path = os.path.join(UPLOAD_DIR, safe_filename)
     with open(file_path, "wb") as buffer:
         buffer.write(await file.read())
+
+    # Apply Tamper-Proof Cryptographic Watermarking
+    try:
+        watermark_image(file_path, latitude, longitude)
+    except Exception as e:
+        print(f"Error applying watermark: {e}")
+
+    # Store a URL-accessible path (served via /uploads static mount)
+    image_url = f"/uploads/{safe_filename}"
 
     # Build spatial point format for PostGIS
     spatial_point = f"POINT({longitude} {latitude})"
 
     # Instantiate base ticket
+    ward_id = get_ward_from_coordinates(latitude, longitude)
     new_ticket = Ticket(
         category=category,
         status=TicketStatus.open,
-        image_url_before=file_path,
+        image_url_before=image_url,
         location=spatial_point,
         reporter_id=reporter_id,
         assigned_to=None
@@ -63,6 +134,7 @@ async def report_issue(
         "category": new_ticket.category,
         "ticket_status": new_ticket.status,
         "allocation_result": assignment_log,
+        "ward": ward_id,
         "coordinates": {"lat": latitude, "lng": longitude}
     }
 

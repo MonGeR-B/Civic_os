@@ -20,8 +20,8 @@ async def log_planted_tree(
     file: UploadFile = File(...),      # Verification photo of the sapling
     db: AsyncSession = Depends(get_db)
 ):
-    # 1. Save the tree photo locally
-    file_path = os.path.join(TREE_UPLOAD_DIR, f"{species}_{planted_by}_{file.filename}")
+    # 1. Save the tree photo locally (normalize path with forward slashes for URLs)
+    file_path = os.path.join(TREE_UPLOAD_DIR, f"{species}_{planted_by}_{file.filename}").replace("\\", "/")
     with open(file_path, "wb") as buffer:
         buffer.write(await file.read())
 

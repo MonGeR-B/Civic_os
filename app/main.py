@@ -22,6 +22,10 @@ app.add_middleware(
 app.include_router(tickets.router, prefix=settings.API_V1_STR)
 app.include_router(trees.router, prefix=settings.API_V1_STR)
 
+# Serve uploaded files (verification photos) over HTTP
+from fastapi.staticfiles import StaticFiles
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
 from fastapi.responses import HTMLResponse
 import os
 
